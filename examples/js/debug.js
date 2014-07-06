@@ -8,6 +8,7 @@ var clock = new THREE.Clock();
 
 var zOffset = -0.5;
 
+var useMarkerOrientation = false, markerBtn;
 
 var settings = {
   scale: 1/70,
@@ -69,6 +70,14 @@ function setupEvents() {
   gamma = document.getElementById('gamma');
 
   window.addEventListener('deviceorientation', setOrientationControls, true);
+
+  markerBtn = document.getElementById('toggle-marker-orientation');
+  markerBtn.addEventListener('click', toggleMarkerOrientation, true);
+}
+
+function toggleMarkerOrientation() {
+  useMarkerOrientation = !useMarkerOrientation;
+  markerBtn.innerHTML = (useMarkerOrientation) ? 'Don\'t Use Marker Orientation' : 'Use Marker Orientation';
 }
 
 function setupScene(){
@@ -133,8 +142,8 @@ function animate(){
   var success = _pt.process();
 
   if (success && _pt.updateTracking() && _pt.trackingInfo.translation != undefined) {
-    updateObject(camera, _pt.trackingInfo.rotation, _pt.trackingInfo.translation);
-    updatePose("pose1", "", "", _pt.trackingInfo.rotation, _pt.trackingInfo.translation);
+    updateObject(camera, _pt.trackingInfo.rotation, _pt.trackingInfo.translation, _pt.camDirection);
+    updatePose("pose1", _pt.markers[0].id, "", _pt.trackingInfo.rotation, _pt.trackingInfo.translation);
   }
 
   mesh.rotation.y += 0.004;
@@ -146,7 +155,7 @@ function render(dt){
   renderer.render(scene, camera);
 };
 
-function updateObject(obj, rotation, translation){
+function updateObject(obj, rotation, translation, camDir){
   var trans = translation;
   if (trans == undefined) {
     return false;
@@ -157,13 +166,15 @@ function updateObject(obj, rotation, translation){
   var ty = settings.filtering.enabled ? may(trans[1]) : trans[1];
   var tz = settings.filtering.enabled ? maz(trans[2]) : trans[2];
 
-  obj.position.x = tx * settings.scale * (camDirection == CAM_DIRS.BACK ? -1 : 1);
+  obj.position.x = tx * settings.scale * (camDir == 'back' ? -1 : 1);
   obj.position.y = ty * settings.scale;
   obj.position.z = tz * settings.scale - 0.5;
 
-  obj.rotation.x = -Math.asin(-rotation[1][2]);
-  obj.rotation.y = -Math.atan2(rotation[0][2], rotation[2][2]);
-  obj.rotation.z = Math.atan2(rotation[1][0], rotation[1][1]);
+  if (useMarkerOrientation) {
+    obj.rotation.x = -Math.asin(-rotation[1][2]);
+    obj.rotation.y = -Math.atan2(rotation[0][2], rotation[2][2]);
+    obj.rotation.z = Math.atan2(rotation[1][0], rotation[1][1]);
+  }
 };
 
 function updatePose(elId, id, error, rotation, translation){
@@ -180,8 +191,8 @@ function updatePose(elId, id, error, rotation, translation){
   var d = document.getElementById(elId);
   d.innerHTML = " x: " + (t[0] | 0)
               + " y: " + (t[1] | 0)
-              + " z: " + (t[2] | 0);
-              //+ "<br/>" + orientationStr;
+              + " z: " + (t[2] | 0)
+              + "<br/>" + orientationStr;
 
   var marker = document.getElementById('marker');
   marker.innerHTML = "markerID: " + id;

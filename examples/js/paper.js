@@ -21,12 +21,6 @@ function moving_average(period) {
   }
 }
 
-var CAM_DIRS = {
-  FRONT: 0, // facing self
-  BACK:  1  // facing world
-};
-var camDirection = CAM_DIRS.FRONT;
-
 var GP = GP || {};
 
 GP.PaperTracker = function(options){
@@ -36,6 +30,8 @@ GP.PaperTracker = function(options){
 	this.video;
 	this.canvas;
 	this.context;
+
+  this.camDirection = 'front'; // back
 
 	this.imageData;
 
