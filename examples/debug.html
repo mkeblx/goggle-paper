@@ -20,14 +20,16 @@
 <div id="container">
   <h1>Goggle Paper &middot; Debug</h1>
 
+  <div>
+
   <div id="scene-container"></div>
 
   <div class="section">
     <video id="video" width="320" height="240" autoplay="true"></video>
     <canvas id="video-canvas" width="320" height="240" style="width: 320px; height: 240px"></canvas>
-    <h3>Tracking info</h3>
+    <h3 style="width: 320px">Tracking info <span style="float: right"><input type="button" value="marker-orientation" name="use marker orientation"></span></h3>
       <div id="pose1" class="t-info">x: NaN y: NaN, z: NaN</div>
-      <div id="marker" class="t-info"></div>
+      <div id="marker" class="t-info">marker ID: ?</div>
       <div id="pose2" class="t-info"></div>
   </div>
 
@@ -36,6 +38,7 @@
     <div class="t-info">&alpha;:<span id="alpha">NaN</span> &beta;:<span id="beta">NaN</span> &gamma;:<span id="gamma">NaN</span></div>
   </div>
 
+  </div>
 </div>
 
 </body>

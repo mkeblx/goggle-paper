@@ -116,8 +116,11 @@ POS.Posit.prototype.pose = function(imagePoints){
     }
   }
 
+  if (error1 == undefined || error2 == undefined)
+    return false;
+
   return error1.euclidean < error2.euclidean?
-    new POS.Pose(error1.pixels, rotation1, translation1, error2.pixels, rotation2, translation2):
+  new POS.Pose(error1.pixels, rotation1, translation1, error2.pixels, rotation2, translation2) : 
     new POS.Pose(error2.pixels, rotation2, translation2, error1.pixels, rotation1, translation1);
 };
 
