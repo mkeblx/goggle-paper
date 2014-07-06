@@ -4,11 +4,11 @@
  * @authod arodic / http://aleksandarrodic.com/
  */
 
-THREE.StereoEffect = function ( renderer , options ) {
+THREE.StereoEffect = function ( renderer, options ) {
 
 	// API
 
-	this.separation =  (options && options.separation) ? options.separation : 1;
+	this.separation =  (options && options.separation) ? options.separation : 0.2;
 
 	// internals
 
