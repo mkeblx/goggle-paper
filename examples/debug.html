@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Debug &middot; Goggle Paper</title>
+  <link href="css/style.css" rel="stylesheet">
+
+  <script src="js/third-party/svd.js"></script> 
+  <script src="js/third-party/posit1.js"></script> 
+  <script src="js/third-party/cv.js"></script> 
+  <script src="js/third-party/aruco.js"></script>
+  <script src="js/third-party/three.min.js"></script>
+
+  <script src="js/debug.js"></script>
+</head>
+<body>
+
+<div id="container">
+  <h1>Goggle Paper &middot; Debug</h1>
+
+  <div id="scene-container"></div>
+
+  <div class="section">
+    <video id="video" width="320" height="240" autoplay="true"></video>
+    <canvas id="video-canvas" width="320" height="240" style="width: 320px; height: 240px"></canvas>
+    <h3>Tracking info</h3>
+      <div id="pose1" class="t-info">x: NaN y: NaN, z: NaN</div>
+      <div id="marker" class="t-info"></div>
+      <div id="pose2" class="t-info"></div>
+  </div>
+
+  <div class="section">
+    <h3>Device orientation</h3>
+    <div class="t-info">&alpha;:<span id="alpha">NaN</span> &beta;:<span id="beta">NaN</span> &gamma;:<span id="gamma">NaN</span></div>
+  </div>
+
+</div>
+
+</body>
+</html>
