@@ -160,9 +160,7 @@ function updateObject(obj, rotation, translation, camDir){
   if (trans == undefined) {
     return false;
   }
-  var tx = !settings.filtering.enabled ?
-    -trans[0] :
-    max(-trans[0]);
+  var tx = settings.filtering.enabled ? max(-trans[0]) : -trans[0];
   var ty = settings.filtering.enabled ? may(trans[1]) : trans[1];
   var tz = settings.filtering.enabled ? maz(trans[2]) : trans[2];
 

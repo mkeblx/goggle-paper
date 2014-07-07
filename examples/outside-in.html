@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Outside-In &middot; Goggle Paper</title>
+    <style>
+    body {
+    	margin:0;
+    	overflow: hidden;
+		}
+
+		#render-canvas {
+		  width: 100%;
+		  height: 100%;
+		}
+    #video {
+      display: none;
+    }
+    #video-canvas {
+      background-color: gray;
+      z-index: 100;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: none;
+    }
+    </style>
+    <script src="js/third-party/three.min.js"></script>
+    <script src="js/third-party/VRRenderer.js"></script>
+
+		<script src="js/third-party/svd.js"></script> 
+		<script src="js/third-party/posit1.js"></script> 
+		<script src="js/third-party/cv.js"></script> 
+		<script src="js/third-party/aruco.js"></script>
+
+    <script src="js/goggle-paper.js"></script>
+
+    <script src="js/outside-in.js"></script>
+</head>
+<body>
+  <video id="video" width="320" height="240" autoplay="true" style="display: none"></video>
+  <canvas id="video-canvas" width="320" height="240" style="width: 320px; height: 240px;"></canvas>
+    <canvas id="render-canvas"></canvas>
+    <div style="position: fixed; top: 8px; left: 8px; color: white">
+    Oculus Rift DK1 demo (requires WebVR build of Firefox)<br>Hit the F key to engage VR rendering</div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-/* paper.js */
+/* google-paper.js */
 'use strict';
 
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
@@ -65,14 +65,15 @@ GP.PaperTracker.prototype.init = function(options){
 };
 
 GP.PaperTracker.prototype.postInit = function(){
+  var vid = this.video;
   navigator.getUserMedia({video:true}, 
     function (stream){
       if (window.webkitURL) {
-        this.video.src = window.webkitURL.createObjectURL(stream);
-      } else if (this.video.mozSrcObject !== undefined) {
-        this.video.mozSrcObject = stream;
+        vid.src = window.webkitURL.createObjectURL(stream);
+      } else if (vid.mozSrcObject !== undefined) {
+        vid.mozSrcObject = stream;
       } else {
-        this.video.src = stream;
+        vid.src = stream;
       }
     },
     function(error){

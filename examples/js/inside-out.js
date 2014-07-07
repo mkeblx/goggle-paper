@@ -4,7 +4,32 @@ var camera, scene, renderer;
 var effect, controls;
 var element, container;
 
+var mesh;
+
 var clock = new THREE.Clock();
+
+var _pt;
+
+var settings = {
+  scale: 1/70,
+  modelSize: 44.0,
+  filtering: {
+    enabled: true,
+    num_samples: 3
+  },
+  prediction: {
+    enabled: false,
+    delta: 0.05
+  }
+};
+
+var useMarkerOrientation = false;
+
+var num_samples = settings.filtering.num_samples;
+
+var max = moving_average(num_samples);
+var may = moving_average(num_samples);
+var maz = moving_average(num_samples);
 
 init();
 animate();
@@ -25,7 +50,7 @@ function init() {
 
   var geo = new THREE.IcosahedronGeometry(1, 1);
   var mat = new THREE.MeshNormalMaterial();
-  var mesh = new THREE.Mesh(geo, mat);
+  mesh = new THREE.Mesh(geo, mat);
   mesh.position.x = 0;
   mesh.position.y = 10;
   mesh.position.z = 3;
@@ -41,6 +66,10 @@ function init() {
   controls.noZoom = true;
   controls.noPan = true;
   controls.autoRotate = false;
+
+  _pt = new GP.PaperTracker(settings);
+
+  _pt.postInit();
 
   function setOrientationControls(e) {
     if (!e.alpha) {
@@ -79,9 +108,9 @@ function init() {
 
   var geometry = new THREE.PlaneGeometry(1000, 1000);
 
-  mesh = new THREE.Mesh(geometry, material);
-  mesh.rotation.x = -Math.PI / 2;
-  scene.add(mesh);
+  var floorMesh = new THREE.Mesh(geometry, material);
+  floorMesh.rotation.x = -Math.PI / 2;
+  scene.add(floorMesh);
 
   window.addEventListener('resize', resize, false);
   setTimeout(resize, 1);
@@ -101,10 +130,38 @@ function resize() {
 function update(dt) {
   resize();
 
-  camera.updateProjectionMatrix();
+  //camera.updateProjectionMatrix();
 
   controls.update(dt);
+
+  var success = _pt.process();
+
+  if (success && _pt.updateTracking() && _pt.trackingInfo.translation != undefined) {
+    updateObject(camera, _pt.trackingInfo.rotation, _pt.trackingInfo.translation, _pt.camDirection);
+  }
+
+  mesh.rotation.y += 0.004;
 }
+
+function updateObject(obj, rotation, translation, camDir){
+  var trans = translation;
+  if (trans == undefined) {
+    return false;
+  }
+  var tx = !settings.filtering.enabled ? -trans[0] : max(-trans[0]);
+  var ty = settings.filtering.enabled ? may(trans[1]) : trans[1];
+  var tz = settings.filtering.enabled ? maz(trans[2]) : trans[2];
+
+  obj.position.x = tx * settings.scale * (camDir == 'back' ? -1 : 1);
+  obj.position.y = ty * settings.scale + 10;
+  obj.position.z = tz * settings.scale - 0.5;
+
+  if (useMarkerOrientation && false) {
+    obj.rotation.x = -Math.asin(-rotation[1][2]);
+    obj.rotation.y = -Math.atan2(rotation[0][2], rotation[2][2]);
+    obj.rotation.z = Math.atan2(rotation[1][0], rotation[1][1]);
+  }
+};
 
 function render(dt) {
   effect.render(scene, camera);
