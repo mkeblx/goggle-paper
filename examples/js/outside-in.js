@@ -36,15 +36,15 @@ window.addEventListener("load", function() {
         navigator.getVRDevices().then(EnumerateVRDevices);
     } else if (navigator.mozGetVRDevices) {
         navigator.mozGetVRDevices(EnumerateVRDevices);
+    } else {
+        var div = document.getElementById('msg');
+        div.style.color = 'black';
+        msg.innerHTML = 'Unsupported setup: you need the Oculus DK1 and WebVR build of Firefox';
     }
 }, false);
 
 window.addEventListener("keypress", function(e) {
     if (e.charCode == 'f'.charCodeAt(0)) {
-        /*renderCanvas.mozRequestFullScreen({
-            vrDisplay: vrHMD
-        });*/
-
         if (renderCanvas.webkitRequestFullscreen) {
             renderCanvas.webkitRequestFullscreen({ vrDisplay: vrHMD, vrDistortion: true });
         } else if (renderCanvas.mozRequestFullScreen) {
