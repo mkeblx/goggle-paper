@@ -66,20 +66,27 @@ GP.PaperTracker.prototype.init = function(options){
 
 GP.PaperTracker.prototype.postInit = function(){
   var vid = this.video;
-  navigator.getUserMedia({video:true}, 
-    function (stream){
-      if (window.webkitURL) {
-        vid.src = window.webkitURL.createObjectURL(stream);
-      } else if (vid.mozSrcObject !== undefined) {
-        vid.mozSrcObject = stream;
-      } else {
-        vid.src = stream;
+  
+  MediaStreamTrack.getSources(function(mediaSources) {
+    mediaSources.forEach(function(mediaSource){
+      if (mediaSource.kind === 'video' && mediaSource.facing == "environment") {
+	navigator.getUserMedia({video: {optional: [{sourceId: mediaSource.id}]}}, 
+          function (stream){
+      	    if (window.webkitURL) {
+              vid.src = window.webkitURL.createObjectURL(stream);
+            } else if (vid.mozSrcObject !== undefined) {
+              vid.mozSrcObject = stream;
+            } else {
+              vid.src = stream;
+            }
+          },
+          function(error){
+            console.log('stream not found');
+          }
+        );
       }
-    },
-    function(error){
-      console.log('stream not found');
-    }
-  );
+    });
+  });
 };
 
 GP.PaperTracker.prototype.snapshot = function(){
