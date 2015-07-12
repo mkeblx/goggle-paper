@@ -21,6 +21,28 @@ function moving_average(period) {
   }
 }
 
+function startCamStream(video, streamId) {
+  var opts = { video: true };
+  if(streamId !== undefined) {
+    opts.video = {optional: [{sourceId: mediaSource.id}]};
+  }
+
+  navigator.getUserMedia(opts,
+    function (stream){
+      if (window.webkitURL) {
+        video.src = window.webkitURL.createObjectURL(stream);
+      } else if (vid.mozSrcObject !== undefined) {
+        video.mozSrcObject = stream;
+      } else {
+        video.src = stream;
+      }
+    },
+    function(error){
+      console.log('stream not found');
+    }
+  );
+}
+
 var GP = GP || {};
 
 GP.PaperTracker = function(options){
@@ -66,20 +88,22 @@ GP.PaperTracker.prototype.init = function(options){
 
 GP.PaperTracker.prototype.postInit = function(){
   var vid = this.video;
-  navigator.getUserMedia({video:true}, 
-    function (stream){
-      if (window.webkitURL) {
-        vid.src = window.webkitURL.createObjectURL(stream);
-      } else if (vid.mozSrcObject !== undefined) {
-        vid.mozSrcObject = stream;
-      } else {
-        vid.src = stream;
-      }
-    },
-    function(error){
-      console.log('stream not found');
-    }
-  );
+
+  if(MediaStreamTrack && MediaStreamTrack.getSources) {
+    MediaStreamTrack.getSources(function(mediaSources) {
+      mediaSources.forEach(function(mediaSource){
+        if (mediaSource.kind === 'video' && mediaSource.facing == "environment") {
+          startCamStream(vid, mediaSource.id);
+          return;
+        }
+      });
+      // No backside camera found, defaulting to any camera
+      startCamStream(vid);
+    });
+  } else {
+    startCamStream(vid);
+  }
+
 };
 
 GP.PaperTracker.prototype.snapshot = function(){
@@ -113,10 +137,10 @@ GP.PaperTracker.prototype.drawCorners = function(){
 
   for (i = 0; i < this.markers.length; ++ i){
     corners = this.markers[i].corners;
-    
+
     this.context.strokeStyle = "red";
     this.context.beginPath();
-    
+
     for (j = 0; j < corners.length; ++ j){
       corner = corners[j];
       this.context.moveTo(corner.x, corner.y);
@@ -126,7 +150,7 @@ GP.PaperTracker.prototype.drawCorners = function(){
 
     this.context.stroke();
     this.context.closePath();
-    
+
     this.context.strokeStyle = "blue";
     this.context.strokeRect(corners[0].x - 2, corners[0].y - 2, 4, 4);
   }
@@ -135,7 +159,7 @@ GP.PaperTracker.prototype.drawCorners = function(){
 
 GP.PaperTracker.prototype.updateTracking = function(){
   var corners, corner, pose, i;
-  
+
   if (this.markers.length == 0) {
     this.trackingInfo.haveTracking = false;
     return false;
@@ -145,14 +169,14 @@ GP.PaperTracker.prototype.updateTracking = function(){
   this.trackingInfo.haveTracking = true;
 
   corners = this.markers[0].corners;
-  
+
   for (i = 0; i < corners.length; ++ i){
     corner = corners[i];
-    
+
     corner.x = corner.x - (this.canvas.width / 2);
     corner.y = (this.canvas.height / 2) - corner.y;
   }
-  
+
   pose = this.posit.pose(corners);
 
   var rotation = pose.bestRotation;
@@ -163,4 +187,3 @@ GP.PaperTracker.prototype.updateTracking = function(){
 
   return this.trackingInfo;
 };
-
